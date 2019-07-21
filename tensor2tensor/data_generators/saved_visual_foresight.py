@@ -89,7 +89,7 @@ class SavedVisualForesight(video_utils.VideoProblem):
     decoders = {
         "frame_number": tf.contrib.slim.tfexample_decoder.Tensor(
             tensor_key="frame_number"),
-        "action": tf.controb.slim.tfexample_decoder.Tensor(tensor_key="action"),
+        "action": tf.contrib.slim.tfexample_decoder.Tensor(tensor_key="action"),
     }
     return data_fields, decoders
 
@@ -99,7 +99,7 @@ class SavedVisualForesight(video_utils.VideoProblem):
                   "action":modalities.ModalityType.REAL_L2_LOSS,
                   "targets": modalities.ModalityType.VIDEO}
     p.vocab_size = {"inputs": 256,
-                    "action":2,
+                    "action":4,
                     "targets": 256}
 
   def parse_frames(self, f, dataset_split):
@@ -117,8 +117,9 @@ class SavedVisualForesight(video_utils.VideoProblem):
             yield step, frame, action
             
   def generate_samples(self, data_dir, tmp_dir, dataset_split):
-    path = generator_utils.maybe_download(
-        tmp_dir, os.path.basename(DATA_URL), DATA_URL)
+#     path = generator_utils.maybe_download(
+#         tmp_dir, os.path.basename(DATA_URL), DATA_URL)
+    path= DATA_URL
 
     f = h5py.File(path, "r")
 
@@ -126,5 +127,5 @@ class SavedVisualForesight(video_utils.VideoProblem):
       yield {
           "frame_number": [frame_number],
           "frame": frame,
-          "action": action,
+          "action": action.tolist(),
       }
