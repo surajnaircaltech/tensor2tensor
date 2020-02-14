@@ -66,6 +66,7 @@ MODULES = [
     "tensor2tensor.data_generators.ptb",
     "tensor2tensor.data_generators.qnli",
     "tensor2tensor.data_generators.quora_qpairs",
+    "tensor2tensor.data_generators.robonet",
     "tensor2tensor.data_generators.rte",
     "tensor2tensor.data_generators.saved_visual_foresight",
     "tensor2tensor.data_generators.scitail",
