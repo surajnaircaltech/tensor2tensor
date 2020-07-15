@@ -2,6 +2,7 @@
 .ipynb_checkpoints/
 tensor2tensor/data_generators/.ipynb_checkpoints/
 data/
+out/
 
 # Compiled python modules.
 *.pyc

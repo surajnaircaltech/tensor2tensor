@@ -36,7 +36,7 @@ import tensorflow as tf
 
 DATA_URL = ("/iris/u/asc8/taskexp/our-smm/exps/mean_block1/max_cms_seed0_block1_grads1/img_memory/0mem.hdf5") # just try this for now
 NUMEP = 500 # Each im buffer has 500 eps
-EPLEN = 50
+EPLEN = 10 # This is really traj length 
 
 @registry.register_problem
 class BatchExploration(video_utils.VideoProblem):
@@ -107,6 +107,8 @@ class BatchExploration(video_utils.VideoProblem):
         ims = f['sim']['states'][:]
         next_ims = f['sim']['next_states'][:]
         acts = f['sim']['actions'][:]
+        
+        ims = np.transpose(ims, (0, 1, 3, 4, 2))
 
         if dataset_split == problem.DatasetSplit.TRAIN:
             start_ep, end_ep = 0, int(NUMEP * 0.8)
