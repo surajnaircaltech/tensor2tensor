@@ -83,7 +83,7 @@ class BatchExploration(video_utils.VideoProblem):
         """Additional data fields to store on disk and their decoders."""
         data_fields = {
             "frame_number": tf.FixedLenFeature([1], tf.int64),
-            "action":tf.FixedLenFeature([4], tf.float32),
+            "action":tf.FixedLenFeature([5], tf.float32),
         }
         decoders = {
             "frame_number": tf.contrib.slim.tfexample_decoder.Tensor(
