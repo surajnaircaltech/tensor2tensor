@@ -34,9 +34,9 @@ from tensor2tensor.utils import registry
 import h5py
 import tensorflow as tf
 
-DATA_URL = ("/iris/u/asc8/taskexp/our-smm/exps/mean_block1/max_cms_seed0_block1_grads1/img_memory/0mem.hdf5") # just try this for now
-NUMEP = 500 # Each im buffer has 500 eps
-EPLEN = 10 # This is really traj length 
+# DATA_URL = ("/iris/u/asc8/taskexp/our-smm/exps/mean_block1/max_cms_seed0_block1_grads1/img_memory/0mem.hdf5") # just try this for now
+NUMEP = 500 # Each im buffer has 500 eps: 5 trajectories of 10 steps each = 2500 trajectories
+EPLEN = 50 # Needs to be 50, should loop through 5 10-step trajs at a time 
 
 @registry.register_problem
 class BatchExploration(video_utils.VideoProblem):
@@ -60,7 +60,7 @@ class BatchExploration(video_utils.VideoProblem):
     # num_hdf * 25000 (num of images per image memory hdf = NUMEP * EPLEN)
     @property
     def total_number_of_frames(self):
-        return 25000
+        return 25000 #6*4*25000
 
     # Not sure if this is correct? We don't have videos
     def max_frames_per_video(self, hparams):
@@ -102,34 +102,39 @@ class BatchExploration(video_utils.VideoProblem):
                         "targets": 256}
 
     def parse_frames(self, f, dataset_split):
-#         ims = f["images"][:]
-#         acts = f["actions"][:]
         ims = f['sim']['states'][:]
         next_ims = f['sim']['next_states'][:]
         acts = f['sim']['actions'][:]
         
-        ims = np.transpose(ims, (0, 1, 3, 4, 2))
+        ims = np.transpose(ims, (0, 1, 3, 4, 2)) # Should be (2500, 10, 64, 64, 3)
 
         if dataset_split == problem.DatasetSplit.TRAIN:
-            start_ep, end_ep = 0, int(NUMEP * 0.8)
+            start_ep, end_ep = 0, int(NUMEP * 0.8) # 400 eps = 2000 trajs
         else:
-            start_ep, end_ep = int(NUMEP * 0.8), NUMEP
-        for ep in range(start_ep, end_ep):
-            for step in range(EPLEN):
-                frame = ims[ep,step]
-                action = acts[ep, step]
-                yield step, frame, action
+            start_ep, end_ep = int(NUMEP * 0.8), NUMEP # 100
+            
+        for ep in range(start_ep, end_ep): # goes from 0 to 399, each 50 step traj
+            for traj_num in range(5): # Go through 5 trajs at a time
+                traj_index = 5 * ep + traj_num # 5*399 + 4 = 1999
+                for step in range(10): # int(EPLEN/5)
+                    frame = ims[traj_index,step] * 255.0 # should be between 0 and 255
+                    action = acts[traj_index, step]
+                    step_num = traj_num * 10 + step
+                    yield step_num, frame, action 
 
+                    
     def generate_samples(self, data_dir, tmp_dir, dataset_split):
-        #     path = generator_utils.maybe_download(
-        #         tmp_dir, os.path.basename(DATA_URL), DATA_URL)
-        path= DATA_URL
+        
+        for i in range(6): # Number of seeds
+            for j in range(4): # Number of buffers per seed
+                path = '/iris/u/asc8/taskexp/our-smm/exps/mean_door/max_tm_cms_seed{}_door_grads1/img_memory/{}mem.hdf5'.format(i, j)
+#                 path= DATA_URL
 
-        f = h5py.File(path, "r")
+                f = h5py.File(path, "r")
 
-        for frame_number, frame, action in self.parse_frames(f, dataset_split):
-            yield {
-                "frame_number": [frame_number],
-                "frame": frame,
-                "action": action.tolist(),
-            }
+                for frame_number, frame, action in self.parse_frames(f, dataset_split): # frame number needs to be 0, ..., 49
+                    yield {
+                        "frame_number": [frame_number],
+                        "frame": frame,
+                        "action": action.tolist(),
+                    }
