@@ -127,7 +127,7 @@ class BatchExplorationDoorMax(video_utils.VideoProblem):
         
         for i in range(6): # Number of seeds
             for j in range(4): # Number of buffers per seed
-                path = '/iris/u/asc8/taskexp/our-smm/exps/mean_door/max_tm_cms_seed{}_door_grads1/img_memory/{}mem.hdf5'.format(i, j)
+                path = '/iris/u/asc8/taskexp/our-smm/exps/new0714/max_tm_cms_seed{}_newdoor_grads1/img_memory/{}mem.hdf5'.format(i, j)
 #                 path= DATA_URL
 
                 f = h5py.File(path, "r")
