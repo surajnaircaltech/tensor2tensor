@@ -60,7 +60,7 @@ class BatchExplorationBlock2Max(video_utils.VideoProblem):
     # num_hdf * 25000 (num of images per image memory hdf = NUMEP * EPLEN)
     @property
     def total_number_of_frames(self):
-        return 25000 #6*4*25000
+        return 5*4*25000
 
     # Not sure if this is correct? We don't have videos
     def max_frames_per_video(self, hparams):
@@ -106,13 +106,14 @@ class BatchExplorationBlock2Max(video_utils.VideoProblem):
         next_ims = f['sim']['next_states'][:]
         acts = f['sim']['actions'][:]
         
-        ims = np.transpose(ims, (0, 1, 3, 4, 2)) # Should be (2500, 10, 64, 64, 3)
+        ims = np.transpose(ims, (0, 1, 3, 4, 2)) # Should be (500, 50, 64, 64, 3)
 
         if dataset_split == problem.DatasetSplit.TRAIN:
-            start_ep, end_ep = 0, int(NUMEP * 0.8) # 400 eps = 2000 trajs
+            start_ep, end_ep = 0, int(NUMEP * 0.8) # 400 eps 
         else:
             start_ep, end_ep = int(NUMEP * 0.8), NUMEP # 100
             
+
         for ep in range(start_ep, end_ep): # goes from 0 to 399, each 50 step traj
             for step in range(EPLEN): # int(EPLEN/5)
                 frame = ims[ep,step] * 255.0 # should be between 0 and 255

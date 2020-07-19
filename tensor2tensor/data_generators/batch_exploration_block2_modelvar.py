@@ -39,7 +39,7 @@ NUMEP = 500 # Each im buffer has 500 eps: 5 trajectories of 10 steps each = 2500
 EPLEN = 50 # Needs to be 50, should loop through 5 10-step trajs at a time 
 
 @registry.register_problem
-class BatchExplorationNewDoorMax(video_utils.VideoProblem):
+class BatchExplorationBlock2Modelvar(video_utils.VideoProblem):
 
     @property
     def num_channels(self):
@@ -140,4 +140,4 @@ class BatchExplorationNewDoorMax(video_utils.VideoProblem):
                         "frame_number": [frame_number],
                         "frame": frame,
                         "action": action.tolist(),
-                    }
+                        }

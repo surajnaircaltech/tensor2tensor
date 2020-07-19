@@ -35,11 +35,11 @@ import h5py
 import tensorflow as tf
 
 # DATA_URL = ("/iris/u/asc8/taskexp/our-smm/exps/mean_block1/max_cms_seed0_block1_grads1/img_memory/0mem.hdf5") # just try this for now
-NUMEP = 500 # Each im buffer has 500 eps: 5 trajectories of 10 steps each = 2500 trajectories
+NUMEP = 500 # Each im buffer has 500 eps: each with 50 steps -> 500 * 50 = 25000 frames each
 EPLEN = 50 # Needs to be 50, should loop through 5 10-step trajs at a time 
 
 @registry.register_problem
-class BatchExplorationNewDoorMax(video_utils.VideoProblem):
+class BatchExplorationRobotMax(video_utils.VideoProblem):
 
     @property
     def num_channels(self):

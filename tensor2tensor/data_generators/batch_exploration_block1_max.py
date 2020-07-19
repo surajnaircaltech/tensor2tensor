@@ -34,12 +34,12 @@ from tensor2tensor.utils import registry
 import h5py
 import tensorflow as tf
 
-DATA_URL = ("/iris/u/asc8/taskexp/our-smm/exps/mean_block1/max_cms_seed0_block1_grads1/img_memory/0mem.hdf5") # just try this for now
-NUMEP = 500 # Each im buffer has 500 eps: 5 trajectories of 10 steps each = 2500 trajectories
+# DATA_URL = ("/iris/u/asc8/taskexp/our-smm/exps/mean_block1/max_cms_seed0_block1_grads1/img_memory/0mem.hdf5") # just try this for now
+NUMEP = 500 # Each im buffer has 500 eps: each with 50 steps -> 500 * 50 = 25000 frames each
 EPLEN = 50 # Needs to be 50, should loop through 5 10-step trajs at a time 
 
 @registry.register_problem
-class BatchExploration(video_utils.VideoProblem):
+class BatchExplorationBlock1Max(video_utils.VideoProblem):
 
     @property
     def num_channels(self):
@@ -60,7 +60,7 @@ class BatchExploration(video_utils.VideoProblem):
     # num_hdf * 25000 (num of images per image memory hdf = NUMEP * EPLEN)
     @property
     def total_number_of_frames(self):
-        return 25000 #6*4*25000
+        return 5*4*25000
 
     # Not sure if this is correct? We don't have videos
     def max_frames_per_video(self, hparams):
@@ -109,7 +109,7 @@ class BatchExploration(video_utils.VideoProblem):
         ims = np.transpose(ims, (0, 1, 3, 4, 2)) # Should be (500, 50, 64, 64, 3)
 
         if dataset_split == problem.DatasetSplit.TRAIN:
-            start_ep, end_ep = 0, int(NUMEP * 0.8) # 400 eps = 2000 trajs
+            start_ep, end_ep = 0, int(NUMEP * 0.8) # 400 eps 
         else:
             start_ep, end_ep = int(NUMEP * 0.8), NUMEP # 100
             
