@@ -106,7 +106,7 @@ class BatchExploration(video_utils.VideoProblem):
         next_ims = f['sim']['next_states'][:]
         acts = f['sim']['actions'][:]
         
-        ims = np.transpose(ims, (0, 1, 3, 4, 2)) # Should be (2500, 10, 64, 64, 3)
+        ims = np.transpose(ims, (0, 1, 3, 4, 2)) # Should be (500, 50, 64, 64, 3)
 
         if dataset_split == problem.DatasetSplit.TRAIN:
             start_ep, end_ep = 0, int(NUMEP * 0.8) # 400 eps = 2000 trajs
@@ -114,20 +114,20 @@ class BatchExploration(video_utils.VideoProblem):
             start_ep, end_ep = int(NUMEP * 0.8), NUMEP # 100
             
         for ep in range(start_ep, end_ep): # goes from 0 to 399, each 50 step traj
-            for traj_num in range(5): # Go through 5 trajs at a time
-                traj_index = 5 * ep + traj_num # 5*399 + 4 = 1999
-                for step in range(10): # int(EPLEN/5)
-                    frame = ims[traj_index,step] * 255.0 # should be between 0 and 255
-                    action = acts[traj_index, step]
-                    step_num = traj_num * 10 + step
-                    yield step_num, frame, action 
+            for step in range(EPLEN): # int(EPLEN/5)
+                frame = ims[ep, step] * 255.0 # should be between 0 and 255
+                action = acts[ep, step]
+                yield step, frame, action 
 
                     
     def generate_samples(self, data_dir, tmp_dir, dataset_split):
         
-        for i in range(6): # Number of seeds
+        for i in range(5): # Number of seeds
             for j in range(4): # Number of buffers per seed
-                path = '/iris/u/asc8/taskexp/our-smm/exps/mean_block1/max_cms_seed{}_block1_grads1/img_memory/{}mem.hdf5'.format(i, j)
+                if i == 4:
+                    path = '/iris/u/asc8/taskexp/our-smm/exps/06_28/max_tm_cm_sep__seed{}_block1_grads1/img_memory/{}mem.hdf5'.format(i, j)
+                else:
+                    path = '/iris/u/asc8/taskexp/our-smm/exps/0_0718/max_tm_cm_sep__seed{}_block1_grads1/img_memory/{}mem.hdf5'.format(i, j)
 #                 path= DATA_URL
 
                 f = h5py.File(path, "r")
