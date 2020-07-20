@@ -131,7 +131,7 @@ class BatchExplorationBlock2SMM(video_utils.VideoProblem):
         
         for i in range(5): # Number of seeds
             for j in range(4): # Number of buffers per seed
-                path = '/iris/u/asc8/taskexp/our-smm/exps/mean_block1/max_cms_seed{}_block1_grads1/img_memory/{}mem.hdf5'.format(i, j)
+                path = '/iris/u/asc8/taskexp/our-smm/exps/07_19_block2/smm_tm_c_sep__seed{}_block2_grads1/img_memory/{}mem.hdf5'.format(i, j)
 
                 f = h5py.File(path, "r")
 

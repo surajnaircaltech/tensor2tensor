@@ -131,10 +131,7 @@ class BatchExplorationBlock0Max(video_utils.VideoProblem):
         
         for i in range(5): # Number of seeds
             for j in range(4): # Number of buffers per seed
-                if i == 4: # Seed 4 saved in a different dir
-                    path = '/iris/u/asc8/taskexp/our-smm/exps/06_28/max_tm_cm_sep__seed{}_block0_grads1/img_memory/{}mem.hdf5'.format(i, j)
-                else:
-                    path = '/iris/u/asc8/taskexp/our-smm/exps/0_0718/max_tm_cm_sep__seed{}_block0_grads1/img_memory/{}mem.hdf5'.format(i, j)
+                path = '/iris/u/asc8/taskexp/our-smm/exps/07_19_block0/max_tm_cm_sep__seed{}_block0_grads1/img_memory/{}mem.hdf5'.format(i, j)
 #                 path= DATA_URL
 
                 f = h5py.File(path, "r")
