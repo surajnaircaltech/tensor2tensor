@@ -39,7 +39,7 @@ NUMEP = 500 # Each im buffer has 500 eps: 5 trajectories of 10 steps each = 2500
 EPLEN = 50 # Needs to be 50, should loop through 5 10-step trajs at a time 
 
 @registry.register_problem
-class BatchExplorationDrawerModelvar(video_utils.VideoProblem):
+class BatchExplorationMultiblockModelvar(video_utils.VideoProblem):
 
     @property
     def num_channels(self):
@@ -131,7 +131,7 @@ class BatchExplorationDrawerModelvar(video_utils.VideoProblem):
         
         for i in range(5): # Number of seeds
             for j in range(4): # Number of buffers per seed
-                path = '/iris/u/asc8/taskexp/our-smm/exps/07_19_drawer/modelvar_tm_c_sep__seed{}_drawer_grads1/img_memory/{}mem.hdf5'.format(i, j)
+                path = '/iris/u/asc8/taskexp/our-smm/exps/07_19_multiblock/modelvar_tm_c_sep__seed{}_block1_grads1/img_memory/{}mem.hdf5'.format(i, j)
 
                 f = h5py.File(path, "r")
 
