@@ -36,7 +36,7 @@ import tensorflow as tf
 
 # DATA_URL = ("/iris/u/asc8/taskexp/our-smm/exps/mean_block1/max_cms_seed0_block1_grads1/img_memory/0mem.hdf5") # just try this for now
 NUMEP = 500 # Each im buffer has 500 eps: each with 50 steps -> 500 * 50 = 25000 frames each
-EPLEN = 50 # Needs to be 50, should loop through 5 10-step trajs at a time 
+EPLEN = 100 # Needs to be 50, should loop through 5 10-step trajs at a time 
 
 @registry.register_problem
 class BatchExplorationRobotMax(video_utils.VideoProblem):
@@ -60,7 +60,7 @@ class BatchExplorationRobotMax(video_utils.VideoProblem):
     # num_hdf * 25000 (num of images per image memory hdf = NUMEP * EPLEN)
     @property
     def total_number_of_frames(self):
-        return 600 * 50 #5*4*25000
+        return 1300 * 100 #5*4*25000
 
     # Not sure if this is correct? We don't have videos
     def max_frames_per_video(self, hparams):
@@ -103,12 +103,12 @@ class BatchExplorationRobotMax(video_utils.VideoProblem):
 
     def parse_frames(self, f, dataset_split, j):
         NUMEP = 500
-        if j == 0:
+        if j < 2:
             ims = f['sim']['states'][:]
             next_ims = f['sim']['next_states'][:]
             acts = f['sim']['actions'][:]
-        if j == 1:
-            NUMEP = 100
+        elif j == 2:
+            NUMEP = 300
             ims = f['sim']['states'][:NUMEP]
             next_ims = f['sim']['next_states'][:NUMEP]
             acts = f['sim']['actions'][:NUMEP]
@@ -138,8 +138,8 @@ class BatchExplorationRobotMax(video_utils.VideoProblem):
     def generate_samples(self, data_dir, tmp_dir, dataset_split):
         
         for i in range(1): # Number of seeds
-            for j in range(2): # Number of buffers per seed
-                path = '/iris/u/surajn/workspace/our-smm/exp/07_20_small_drawer_vaenogoal/max_tm_cm_vng__sep__seed0_block2_grads1_ROBOT/img_memory/{}mem.hdf5'.format(i, j)
+            for j in range(3): # Number of buffers per seed
+                path = '/iris/u/surajn/workspace/our-smm/exp/07_20_small_drawer_cam2_H100/max_tm_cm_vng__sep__seed{}_block2_grads1_ROBOT/img_memory/{}mem.hdf5'.format(i, j)
 
                 f = h5py.File(path, "r")
 

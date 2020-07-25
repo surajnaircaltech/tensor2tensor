@@ -36,7 +36,7 @@ import tensorflow as tf
 
 # DATA_URL = ("/iris/u/asc8/taskexp/our-smm/exps/mean_block1/max_cms_seed0_block1_grads1/img_memory/0mem.hdf5") # just try this for now
 NUMEP = 500 # Each im buffer has 500 eps: each with 50 steps -> 500 * 50 = 25000 frames each
-EPLEN = 50 # Needs to be 50, should loop through 5 10-step trajs at a time 
+EPLEN = 100 # Needs to be 50, should loop through 5 10-step trajs at a time 
 
 @registry.register_problem
 class BatchExplorationRobotModelvar(video_utils.VideoProblem):
@@ -60,7 +60,7 @@ class BatchExplorationRobotModelvar(video_utils.VideoProblem):
     # num_hdf * 25000 (num of images per image memory hdf = NUMEP * EPLEN)
     @property
     def total_number_of_frames(self):
-        return 5*4*25000
+        return 1300 * 100 #5*4*25000
 
     # Not sure if this is correct? We don't have videos
     def max_frames_per_video(self, hparams):
@@ -83,7 +83,7 @@ class BatchExplorationRobotModelvar(video_utils.VideoProblem):
         """Additional data fields to store on disk and their decoders."""
         data_fields = {
             "frame_number": tf.FixedLenFeature([1], tf.int64),
-            "action":tf.FixedLenFeature([5], tf.float32),
+            "action":tf.FixedLenFeature([4], tf.float32),
         }
         decoders = {
             "frame_number": tf.contrib.slim.tfexample_decoder.Tensor(
@@ -98,13 +98,21 @@ class BatchExplorationRobotModelvar(video_utils.VideoProblem):
                       "action":modalities.ModalityType.REAL_L2_LOSS,
                       "targets": modalities.ModalityType.VIDEO}
         p.vocab_size = {"inputs": 256, 
-                        "action": 5,
+                        "action": 4,
                         "targets": 256}
 
-    def parse_frames(self, f, dataset_split):
-        ims = f['sim']['states'][:]
-        next_ims = f['sim']['next_states'][:]
-        acts = f['sim']['actions'][:]
+    def parse_frames(self, f, dataset_split, j):
+        NUMEP = 500
+        if j < 2:
+            ims = f['sim']['states'][:]
+            next_ims = f['sim']['next_states'][:]
+            acts = f['sim']['actions'][:]
+        elif j == 2:
+            NUMEP = 140
+            ims = f['sim']['states'][:NUMEP]
+            next_ims = f['sim']['next_states'][:NUMEP]
+            acts = f['sim']['actions'][:NUMEP]
+            
         
         ims = np.transpose(ims, (0, 1, 3, 4, 2)) # Should be (500, 50, 64, 64, 3)
 
@@ -129,13 +137,13 @@ class BatchExplorationRobotModelvar(video_utils.VideoProblem):
                     
     def generate_samples(self, data_dir, tmp_dir, dataset_split):
         
-        for i in range(5): # Number of seeds
-            for j in range(4): # Number of buffers per seed
-                path = '/iris/u/asc8/taskexp/our-smm/exps/mean_block1/max_cms_seed{}_block1_grads1/img_memory/{}mem.hdf5'.format(i, j)
+        for i in range(1): # Number of seeds
+            for j in range(3): # Number of buffers per seed
+                path = '/iris/u/surajn/workspace/our-smm/exp/07_23_small_drawer_cam2_H100/modelvar_tm_c_vng__sep__seed{}_block2_grads1_ROBOT/img_memory/{}mem.hdf5'.format(i, j)
 
                 f = h5py.File(path, "r")
 
-                for frame_number, frame, action in self.parse_frames(f, dataset_split): # frame number needs to be 0, ..., 49
+                for frame_number, frame, action in self.parse_frames(f, dataset_split, j): # frame number needs to be 0, ..., 49
                     yield {
                         "frame_number": [frame_number],
                         "frame": frame,
