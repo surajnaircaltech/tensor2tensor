@@ -60,7 +60,7 @@ class BatchExplorationBlock2Max(video_utils.VideoProblem):
     # num_hdf * 25000 (num of images per image memory hdf = NUMEP * EPLEN)
     @property
     def total_number_of_frames(self):
-        return 5*4*25000
+        return 5*4*25000 + 9*25000
 
     # Not sure if this is correct? We don't have videos
     def max_frames_per_video(self, hparams):
@@ -125,7 +125,7 @@ class BatchExplorationBlock2Max(video_utils.VideoProblem):
         
         for i in range(5): # Number of seeds
             for j in range(4): # Number of buffers per seed
-                path = '/iris/u/asc8/taskexp/our-smm/exps/07_19_block2/max_tm_cm_sep__seed{}_block2_grads1/img_memory/{}mem.hdf5'.format(i, j)
+                path = '/iris/u/hjnam/task_exp/batch_exploration/exps/08_15_block2/max_sn__seed{}_block2/img_memory/{}mem.hdf5'.format(i, j)
 #                 path= DATA_URL
 
                 f = h5py.File(path, "r")
@@ -136,3 +136,17 @@ class BatchExplorationBlock2Max(video_utils.VideoProblem):
                         "frame": frame,
                         "action": action.tolist(),
                     }
+                
+        # Load in random data        
+        for j in range(9): # 10 buffers
+            path = '/iris/u/hjnam/task_exp/batch_exploration/exps/08_19_block_random/_seed0_block2/img_memory/{}mem.hdf5'.format(j)
+#                 path= DATA_URL
+
+            f = h5py.File(path, "r")
+
+            for frame_number, frame, action in self.parse_frames(f, dataset_split): # frame number needs to be 0, ..., 49
+                yield {
+                    "frame_number": [frame_number],
+                    "frame": frame,
+                    "action": action.tolist(),
+                }

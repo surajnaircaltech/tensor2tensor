@@ -33,6 +33,11 @@ from tensor2tensor.layers import modalities
 from tensor2tensor.utils import registry
 import h5py
 import tensorflow as tf
+from tensorflow.compat.v1 import ConfigProto
+from tensorflow.compat.v1 import InteractiveSession
+config = ConfigProto()
+config.gpu_options.allow_growth = True
+session = InteractiveSession(config=config)
 
 # DATA_URL = ("/iris/u/asc8/taskexp/our-smm/exps/mean_block1/max_cms_seed0_block1_grads1/img_memory/0mem.hdf5") # just try this for now
 NUMEP = 500 # Each im buffer has 500 eps: each with 50 steps -> 500 * 50 = 25000 frames each
@@ -60,7 +65,7 @@ class BatchExplorationRobotMax(video_utils.VideoProblem):
     # num_hdf * 25000 (num of images per image memory hdf = NUMEP * EPLEN)
     @property
     def total_number_of_frames(self):
-        return 1300 * 100 #5*4*25000
+        return 500 * 100 * 4 #5*4*25000
 
     # Not sure if this is correct? We don't have videos
     def max_frames_per_video(self, hparams):
@@ -108,13 +113,13 @@ class BatchExplorationRobotMax(video_utils.VideoProblem):
             next_ims = f['sim']['next_states'][:]
             acts = f['sim']['actions'][:]
         elif j == 2:
-            NUMEP = 300
+            NUMEP = 140
             ims = f['sim']['states'][:NUMEP]
             next_ims = f['sim']['next_states'][:NUMEP]
             acts = f['sim']['actions'][:NUMEP]
             
         
-        ims = np.transpose(ims, (0, 1, 3, 4, 2)) # Should be (500, 50, 64, 64, 3)
+        ims = np.transpose(ims, (0, 1, 3, 4, 2)) # Should be (500, 100, 64, 64, 3)
 
         if dataset_split == problem.DatasetSplit.TRAIN:
             start_ep, end_ep = 0, int(NUMEP * 0.8) # 400 eps 
@@ -138,8 +143,8 @@ class BatchExplorationRobotMax(video_utils.VideoProblem):
     def generate_samples(self, data_dir, tmp_dir, dataset_split):
         
         for i in range(1): # Number of seeds
-            for j in range(3): # Number of buffers per seed
-                path = '/iris/u/surajn/workspace/our-smm/exp/07_20_small_drawer_cam2_H100/max_tm_cm_vng__sep__seed{}_block2_grads1_ROBOT/img_memory/{}mem.hdf5'.format(i, j)
+            for j in range(2): # Number of buffers per seed
+                path = '/iris/u/surajn/workspace/batch_exploration/exps/robot_drawer_09_12_nv/max_sn__vng__seed{}_block2_ROBOT/img_memory/{}mem.hdf5'.format(i, j)
 
                 f = h5py.File(path, "r")
 
@@ -149,3 +154,18 @@ class BatchExplorationRobotMax(video_utils.VideoProblem):
                         "frame": frame,
                         "action": action.tolist(),
                     }
+
+        # Load in random data
+        for j in range(2): # 2 buffers
+            print("buffer", j)
+            path = '/iris/u/surajn/workspace/batch_exploration/exps/robot_drawer_09_15_nv_random/max_sn__vng__seed0_block2_ROBOT/img_memory/{}mem.hdf5'.format(j)
+#                 path= DATA_URL
+
+            f = h5py.File(path, "r")
+
+            for frame_number, frame, action in self.parse_frames(f, dataset_split, j): # frame number needs to be 0, ..., 49
+                yield {
+                    "frame_number": [frame_number],
+                    "frame": frame,
+                    "action": action.tolist(),
+                }
