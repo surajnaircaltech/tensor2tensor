@@ -29,6 +29,7 @@ MODULES = [
     "tensor2tensor.data_generators.algorithmic_math_two_variables",
     "tensor2tensor.data_generators.allen_brain",
     "tensor2tensor.data_generators.audio",
+    "tensor2tensor.data_generators.lang_robot",
     "tensor2tensor.data_generators.batch_exploration_block0_max",
     "tensor2tensor.data_generators.batch_exploration_block0_smm",
     "tensor2tensor.data_generators.batch_exploration_block0_modelvar",
