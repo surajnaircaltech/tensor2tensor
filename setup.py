@@ -34,7 +34,7 @@ setup(
     ],
     install_requires=[
         'bz2file',
-        'dopamine-rl',
+        'dopamine-rl==3.0.1',
         'flask',
         'future',
         'gevent',
